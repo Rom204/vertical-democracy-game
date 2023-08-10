@@ -47,6 +47,14 @@ const controlsBar = {
   x: 0,
   y: canvas.height - cellSize,
 };
+
+const enemyBar = {
+  width: canvas.width,
+  height: cellSize,
+  x: 0,
+  y: 0,
+};
+
 class Cell {
   constructor(x, y) {
     this.x = x;
@@ -62,7 +70,7 @@ class Cell {
   }
 }
 function createGrid() {
-  for (let y = 0; y < canvas.height - cellSize; y += cellSize) {
+  for (let y = cellSize; y < canvas.height - cellSize; y += cellSize) {
     for (let x = 0; x < canvas.width; x += cellSize) {
       gameGrid.push(new Cell(x, y));
     }
@@ -75,24 +83,52 @@ function handleGameGrid() {
   }
 }
 // projectiles
+const projectileTypes = [];
+const israelFlag = new Image();
+israelFlag.src = "israelFlag1.png";
+projectileTypes.push(israelFlag);
 
 class Projectile {
   constructor(x, y) {
     this.x = x;
     this.y = y;
-    this.width = 10;
-    this.height = 10;
+    this.width = 100;
+    this.height = 100;
     this.power = 50;
     this.speed = 7;
+    this.projectileType = projectileTypes[0];
+    this.frameX = 0;
+    this.frameY = 0;
+    this.minFrame = 0;
+    this.maxFrame = 4;
+    this.spriteWidth = 200;
+    this.spriteHeight = 200;
   }
   update() {
     this.y -= this.speed;
+    if (frame % 10 === 0) {
+      if (this.frameY < this.maxFrame) this.frameY++;
+      else this.frameY = this.minFrame;
+    }
   }
   draw() {
-    context.fillStyle = "black";
-    context.beginPath();
+    context.fillStyle = "white";
+    // context.beginPath();
     context.arc(this.x, this.y, this.width, 0, Math.PI * 2);
-    context.fill();
+    // context.fill();
+    // context.fillRect(this.x, this.y, this.width, this.height);
+    // context.fillStyle = 'red'
+    context.drawImage(
+      this.projectileType,
+      0,
+      this.frameY * this.spriteHeight,
+      this.spriteWidth,
+      this.spriteHeight,
+      this.x,
+      this.y,
+      this.width,
+      this.height
+    );
   }
 }
 function handleProjectiles() {
@@ -123,6 +159,7 @@ function handleProjectiles() {
 }
 // defenders
 const defender1 = new Image();
+// TODO: change kaplan defender name from work
 defender1.src = "work.png";
 class Defender {
   constructor(x, y) {
@@ -134,12 +171,12 @@ class Defender {
     this.health = 100;
     this.projectiles = [];
     this.timer = 0;
-    this.frameX = 0;
-    this.frameY = 0;
+    // this.frameX = 0;
+    // this.frameY = 0;
     this.spriteWidth = 180;
     this.spriteHeight = 180;
-    this.minFrame = 0;
-    this.maxFrame = 16;
+    // this.minFrame = 0;
+    // this.maxFrame = 16;
   }
   draw() {
     // context.fillStyle = "blue";
@@ -163,7 +200,7 @@ class Defender {
     if (this.shooting) {
       this.timer++;
       if (this.timer % 100 === 0) {
-        projectiles.push(new Projectile(this.x + 50, this.y + 20));
+        projectiles.push(new Projectile(this.x, this.y));
       }
     } else {
       this.timer = 0;
@@ -217,11 +254,11 @@ function handleDefenders() {
 class Enemy {
   constructor(horizontalPosition) {
     this.x = horizontalPosition;
-    this.y = 0;
+    this.y = cellSize;
     this.width = cellSize - cellGap * 2;
     this.height = cellSize - cellGap * 2;
-    // this.speed = Math.random() * 0.0001 + 0.04;
-    this.speed = Math.random() * 0.2 + 0.4;
+    this.speed = Math.random() * 0.0001 + 0.04;
+    // this.speed = Math.random() * 0.2 + 0.4;
     this.movement = this.speed;
     this.health = 100;
     this.maxHealth = this.health;
@@ -241,7 +278,7 @@ function handleEnemies() {
   for (let i = 0; i < enemies.length; i++) {
     enemies[i].update();
     enemies[i].draw();
-    
+
     if (enemies[i].y >= canvas.height - cellSize * 2) {
       gameOver = true;
     }
@@ -269,21 +306,38 @@ function handleEnemies() {
 }
 
 // resources
+const resourceTypes = [];
+const megaPhone = new Image();
+megaPhone.src = "megaPhone.png";
+resourceTypes.push(megaPhone);
+
 const amounts = [20, 30, 40];
 class Resource {
   constructor() {
-    this.x = Math.floor(Math.random() * 5) + 1 * cellSize + 25;
-    this.y = Math.random() * (canvas.width - cellSize);
-    this.width = cellSize * 0.6;
-    this.height = cellSize * 0.6;
+    this.x = (Math.floor(Math.random() * 5) + 1) * cellSize - 100;
+    this.y = 100 + (Math.random() * (canvas.height - (cellSize * 2.5)));
+    // this.y = Math.random() * (cellSize);
+    this.width = cellSize * 0.4;
+    this.height = cellSize * 0.4;
     this.amount = amounts[Math.floor(Math.random() * amounts.length)];
+    this.spriteWidth = 150;
+    this.spriteHeight = 120;
+    this.resourceType = resourceTypes[0];
+
   }
   draw() {
-    context.fillStyle = "yellow";
-    context.fillRect(this.x, this.y, this.width, this.height);
-    context.fillStyle = "black";
-    context.font = "20px Arial";
-    context.fillText(this.amount, this.x + 15, this.y + 25);
+    // context.fillStyle = "yellow";
+    // context.fillRect(this.x, this.y, this.width, this.height);
+    // context.fillStyle = "black";
+    // context.font = "20px Arial";
+    // context.fillText(this.amount, this.x + 15, this.y + 25);
+    context.drawImage(
+      megaPhone,
+      this.x - 55,
+      this.y - 45,
+      this.spriteWidth,
+      this.spriteHeight
+    );
   }
 }
 
@@ -319,9 +373,27 @@ function handleGameStatus() {
     context.fillText("You win with " + score + " points!", 0, 340);
   }
 }
+const bibi = new Image();
+bibi.src = "bibi.png";
 
 function animate() {
   context.clearRect(0, 0, canvas.width, canvas.height);
+  context.fillStyle = "orange";
+  
+  context.fillRect(
+    enemyBar.x,
+    enemyBar.y,
+    enemyBar.width,
+    enemyBar.height
+    );
+  context.drawImage(
+    bibi,
+    0,
+    0,
+    152,
+    100
+  )
+    
   context.fillStyle = "blue";
   context.fillRect(
     controlsBar.x,
