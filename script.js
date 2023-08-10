@@ -54,6 +54,10 @@ const enemyBar = {
   x: 0,
   y: 0,
 };
+const mapTypes = [];
+const road = new Image();
+road.src = "road1.png";
+mapTypes.push(road);
 
 class Cell {
   constructor(x, y) {
@@ -61,8 +65,16 @@ class Cell {
     this.y = y;
     this.width = cellSize;
     this.height = cellSize;
+    this.map = mapTypes[0]
   }
   draw() {
+    context.drawImage(
+      this.map,
+      this.x,
+      this.y,
+      this.width,
+      this.height,
+    );
     if (mouse.x && mouse.y && collision(this, mouse)) {
       context.strokeStyle = "black";
       context.strokeRect(this.x, this.y, this.width, this.height);
