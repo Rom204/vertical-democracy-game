@@ -14,6 +14,7 @@ let frame = 0;
 let gameOver = false;
 let score = 0;
 const winningScore = 200;
+let selectedDefender = false;
 const gameGrid = [];
 const defenders = [];
 const enemies = [];
@@ -108,27 +109,31 @@ israelFlag.src = "./assets/israelFlag1.png";
 projectileTypes.push(israelFlag);
 
 class Projectile {
+  // static power = 20;
   constructor(x, y) {
     this.x = x;
     this.y = y;
     this.width = 100;
     this.height = 100;
-    this.power = 50;
-    this.speed = 7;
+    this.power = 20;
+    this.speed = 4;
     this.projectileType = projectileTypes[0];
     this.frameX = 0;
     this.frameY = 0;
     this.minFrame = 0;
-    this.maxFrame = 4;
+    this.maxFrame = 3;
     this.spriteWidth = 200;
     this.spriteHeight = 200;
   }
   update() {
     this.y -= this.speed;
-    if (frame % 2 === 0) {
+    if (frame % 5 === 0) {
       if (this.frameY < this.maxFrame) this.frameY++;
       else this.frameY = this.minFrame;
     }
+  }
+  powerUp(){
+    if (this.power <= 50) this.power += 5;
   }
   draw() {
     context.fillStyle = "white";
@@ -150,6 +155,7 @@ class Projectile {
     );
   }
 }
+
 function handleProjectiles() {
   for (let i = 0; i < projectiles.length; i++) {
     projectiles[i].update();
@@ -179,7 +185,8 @@ function handleProjectiles() {
 // defenders
 const defender1 = new Image();
 // TODO: change kaplan defender name from work
-defender1.src = "./assets/work.png";
+defender1.src = "./assets/kaplanProtestor.png";
+// defender1.src = "./assets/work.png";
 class Defender {
   constructor(x, y) {
     this.x = x;
@@ -189,7 +196,8 @@ class Defender {
     this.shooting = false;
     this.health = 100;
     this.projectiles = [];
-    this.timer = 0;
+    this.timer = 2;
+    this.fireRate = 100;
     // this.frameX = 0;
     // this.frameY = 0;
     this.spriteWidth = 180;
@@ -200,30 +208,34 @@ class Defender {
   draw() {
     // context.fillStyle = "blue";
     // context.fillRect(this.x, this.y, this.width, this.height);
+    
     context.fillStyle = "gold";
     context.font = "20px Arial";
     context.fillText(Math.floor(this.health), this.x + 5, this.y + 90);
     context.drawImage(
       defender1,
-      this.x - 50,
-      this.y - 50,
-      this.spriteWidth,
-      this.spriteHeight
-      // this.x,
-      // this.y,
-      // this.width,
-      // this.height
+      0,
+      0,
+      628,
+      628,
+      this.x,
+      this.y,
+      this.width,
+      this.height
     );
   }
   update() {
     if (this.shooting) {
-      this.timer +=5;
-      if (this.timer % 100 === 0) {
+      this.timer += 2;
+      if (this.timer % this.fireRate === 0) {
         projectiles.push(new Projectile(this.x, this.y));
       }
     } else {
       this.timer = 0;
     }
+  }
+  fireRate(){
+    if (this.fireRate >= 40) this.fireRate -= 10
   }
 }
 
@@ -278,7 +290,21 @@ const warrior = {
 };
 
 function chooseAction() {
+  // defender selection
+  // let strokeColor = 'black';
+  // if (collision(mouse, warrior) && mouse.clicked){
+  //   strokeColor = 'gold';
+  //   selectedDefender = true;
+  // } 
+  // if (selectedDefender) strokeColor = 'gold';
+
+  // powerUp activate
+  if (collision(mouse, powerUp) && mouse.clicked){
+    Projectile.powerUp();
+  }
+
   context.lineWidth = 1;
+  context.fillStyle = 'rgba(0,0,0,0.5)';
   context.fillRect(powerUp.x, powerUp.y, powerUp.width, powerUp.height);
   context.drawImage(
     powerUpIcon,
@@ -304,16 +330,18 @@ function chooseAction() {
     speedUp.height - 20
   );
   context.fillRect(warrior.x, warrior.y, warrior.width, warrior.height);
+  // context.strokeStyle = strokeColor;
+  context.strokeRect(warrior.x, warrior.y, warrior.width, warrior.height);
   context.drawImage(
     defender1,
     0,
     0,
-    230,
-    230,
-    warrior.x + 10,
-    warrior.y + 10,
-    180,
-    180
+    628,
+    628,
+    warrior.x,
+    warrior.y,
+    80,
+    80
   );
 }
 
@@ -353,7 +381,10 @@ function handleFloatingMessages() {
     }
   }
 }
-
+let enemyTypes = [];
+const lawScroll = new Image();
+lawScroll.src = "./assets/scroll.png";
+enemyTypes.push(lawScroll);
 // enemies
 class Enemy {
   constructor(horizontalPosition) {
@@ -366,17 +397,29 @@ class Enemy {
     this.movement = this.speed;
     this.health = 100;
     this.maxHealth = this.health;
+    this.enemyType = enemyTypes[0];
   }
   update() {
     this.y += this.movement;
   }
   draw() {
-    context.fillStyle = "red";
-    context.fillRect(this.x, this.y, this.width, this.height);
-    context.fillStyle = "black";
-    context.font = "30px Arial";
-    context.fillText(Math.floor(this.health), this.x + 15, this.y + 30);
-  }
+    // context.fillStyle = "red";
+    // context.fillRect(this.x, this.y, this.width, this.height);
+    context.drawImage(
+      this.enemyType,
+      0,
+      0,
+      495,
+      643,
+      this.x,
+      this.y,
+      this.width,
+      this.height
+      )
+      context.fillStyle = "black";
+      context.font = "30px Arial";
+      context.fillText(Math.floor(this.health), this.x + 15, this.y + 30);
+    }
 }
 function handleEnemies() {
   for (let i = 0; i < enemies.length; i++) {
@@ -420,10 +463,10 @@ function handleEnemies() {
   if (frame % enemiesInterval === 0 && score < winningScore) {
     let horizontalPosition =
       Math.floor(Math.random() * 5 + 1) * cellSize - 100 + cellGap;
-    console.log(horizontalPosition);
+    // console.log(horizontalPosition);
     enemies.push(new Enemy(horizontalPosition));
     enemyPositions.push(horizontalPosition);
-    console.log("Enemies ", [...enemies], "enemies position", enemyPositions);
+    // console.log("Enemies ", [...enemies], "enemies position", enemyPositions);
     if (enemiesInterval > 120) enemiesInterval -= 100;
   }
 }
@@ -454,7 +497,7 @@ class Resource {
     // context.font = "20px Arial";
     // context.fillText(this.amount, this.x + 15, this.y + 25);
     context.drawImage(
-      megaPhone,
+      this.resourceType,
       this.x - 55,
       this.y - 45,
       this.spriteWidth,
@@ -534,8 +577,8 @@ canvas.addEventListener("click", function () {
   }
   let defenderCost = 100;
   if (numberOfResources >= defenderCost) {
-    defenders.push(new Defender(gridPositionX, gridPositionY));
-    numberOfResources -= defenderCost;
+      defenders.push(new Defender(gridPositionX, gridPositionY));
+      numberOfResources -= defenderCost;
   } else {
     floatingMessages.push(
       new FloatingMessage(
