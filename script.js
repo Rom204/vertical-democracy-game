@@ -26,8 +26,21 @@ const mouse = {
   y: 10,
   width: 0.1,
   height: 0.1,
+  clicked: false,
 };
 // console.log(canvas);
+
+canvas.addEventListener("mousedown", function () {
+  mouse.clicked = true;
+  console.log(mouse.clicked);
+
+});
+
+canvas.addEventListener("mouseup", function () {
+  mouse.clicked = false;
+  console.log(mouse.clicked);
+
+});
 
 canvas.addEventListener("mousemove", function (e) {
   mouse.x = e.x - canvasPosition.left;
@@ -56,7 +69,7 @@ const enemyBar = {
 };
 const mapTypes = [];
 const road = new Image();
-road.src = "road1.png";
+road.src = "./assets/road2.png";
 mapTypes.push(road);
 
 class Cell {
@@ -65,18 +78,12 @@ class Cell {
     this.y = y;
     this.width = cellSize;
     this.height = cellSize;
-    this.map = mapTypes[0]
+    this.map = mapTypes[0];
   }
   draw() {
-    context.drawImage(
-      this.map,
-      this.x,
-      this.y,
-      this.width,
-      this.height,
-    );
+    context.drawImage(this.map, this.x, this.y, this.width, this.height);
     if (mouse.x && mouse.y && collision(this, mouse)) {
-      context.strokeStyle = "black";
+      context.strokeStyle = "blue";
       context.strokeRect(this.x, this.y, this.width, this.height);
     }
   }
@@ -97,7 +104,7 @@ function handleGameGrid() {
 // projectiles
 const projectileTypes = [];
 const israelFlag = new Image();
-israelFlag.src = "israelFlag1.png";
+israelFlag.src = "./assets/israelFlag1.png";
 projectileTypes.push(israelFlag);
 
 class Projectile {
@@ -118,7 +125,7 @@ class Projectile {
   }
   update() {
     this.y -= this.speed;
-    if (frame % 10 === 0) {
+    if (frame % 2 === 0) {
       if (this.frameY < this.maxFrame) this.frameY++;
       else this.frameY = this.minFrame;
     }
@@ -126,7 +133,7 @@ class Projectile {
   draw() {
     context.fillStyle = "white";
     // context.beginPath();
-    context.arc(this.x, this.y, this.width, 0, Math.PI * 2);
+    // context.arc(this.x, this.y, this.width, 0, Math.PI * 2);
     // context.fill();
     // context.fillRect(this.x, this.y, this.width, this.height);
     // context.fillStyle = 'red'
@@ -172,7 +179,7 @@ function handleProjectiles() {
 // defenders
 const defender1 = new Image();
 // TODO: change kaplan defender name from work
-defender1.src = "work.png";
+defender1.src = "./assets/work.png";
 class Defender {
   constructor(x, y) {
     this.x = x;
@@ -210,7 +217,7 @@ class Defender {
   }
   update() {
     if (this.shooting) {
-      this.timer++;
+      this.timer +=5;
       if (this.timer % 100 === 0) {
         projectiles.push(new Projectile(this.x, this.y));
       }
@@ -219,24 +226,6 @@ class Defender {
     }
   }
 }
-canvas.addEventListener("click", function () {
-  const gridPositionX = mouse.x - (mouse.x % cellSize) + cellGap;
-  const gridPositionY = mouse.y - (mouse.y % cellSize) + cellGap;
-  // placement higher than controls bar
-  if (gridPositionY > controlsBar.y) return;
-  // cancel placement on top of each other
-  for (let i = 0; i < defenders.length; i++) {
-    if (defenders[i].x === gridPositionX && defenders[i].y === gridPositionY)
-      return;
-  }
-  let defenderCost = 100;
-  if (numberOfResources >= defenderCost) {
-    console.log("create defender:", new Date().toLocaleTimeString());
-    defenders.push(new Defender(gridPositionX, gridPositionY));
-    numberOfResources -= defenderCost;
-    console.log(defenders);
-  }
-});
 
 function handleDefenders() {
   for (let i = 0; i < defenders.length; i++) {
@@ -260,17 +249,120 @@ function handleDefenders() {
     }
   }
 }
+const powerUpIcon = new Image();
+powerUpIcon.src = "./assets/powerUpIcon.png";
+
+const speedUpIcon = new Image();
+speedUpIcon.src = "./assets/speedUpIcon.png";
+
+
+const powerUp = {
+  x: 10,
+  y: canvas.height - cellSize + 10,
+  width: cellSize - 20,
+  height: cellSize - 20,
+};
+
+const speedUp = {
+  x: cellSize + 10,
+  y: canvas.height - cellSize + 10,
+  width: cellSize - 20,
+  height: cellSize - 20,
+};
+
+const warrior = {
+  x: cellSize * 2 + 10,
+  y: canvas.height - cellSize + 10,
+  width: cellSize - 20,
+  height: cellSize - 20,
+};
+
+function chooseAction() {
+  context.lineWidth = 1;
+  context.fillRect(powerUp.x, powerUp.y, powerUp.width, powerUp.height);
+  context.drawImage(
+    powerUpIcon,
+    0,
+    0,
+    230,
+    230,
+    powerUp.x + 10,
+    powerUp.y + 10,
+    powerUp.width - 20,
+    powerUp.height - 20
+  );
+  context.fillRect(speedUp.x, speedUp.y, speedUp.width, speedUp.height);
+  context.drawImage(
+    speedUpIcon,
+    0,
+    0,
+    230,
+    230,
+    speedUp.x + 10,
+    speedUp.y + 10,
+    speedUp.width - 20,
+    speedUp.height - 20
+  );
+  context.fillRect(warrior.x, warrior.y, warrior.width, warrior.height);
+  context.drawImage(
+    defender1,
+    0,
+    0,
+    230,
+    230,
+    warrior.x + 10,
+    warrior.y + 10,
+    180,
+    180
+  );
+}
+
+// floating messages
+const floatingMessages = [];
+class FloatingMessage {
+  constructor(value, x, y, size, color) {
+    this.value = value;
+    this.x = x;
+    this.y = y;
+    this.size = size;
+    this.color = color;
+    this.lifeSpan = 0;
+    this.opacity = 1;
+  }
+  update() {
+    this.y -= 0.3;
+    this.lifeSpan += 1;
+    if (this.opacity > 0.01) this.opacity -= 0.01;
+  }
+  draw() {
+    context.globalAlpha = this.opacity;
+    context.fillStyle = this.color;
+    context.font = this.size + "px Arial";
+    context.fillText(this.value, this.x, this.y);
+    context.globalAlpha = 1;
+  }
+}
+
+function handleFloatingMessages() {
+  for (let i = 0; i < floatingMessages.length; i++) {
+    floatingMessages[i].update();
+    floatingMessages[i].draw();
+    if (floatingMessages[i].lifeSpan >= 50) {
+      floatingMessages.splice(i, 1);
+      i--;
+    }
+  }
+}
 
 // enemies
-
 class Enemy {
   constructor(horizontalPosition) {
     this.x = horizontalPosition;
     this.y = cellSize;
     this.width = cellSize - cellGap * 2;
     this.height = cellSize - cellGap * 2;
-    this.speed = Math.random() * 0.0001 + 0.04;
-    // this.speed = Math.random() * 0.2 + 0.4;
+    // this.speed = Math.random() * 0.0001 + 0.04;
+    this.speed = Math.random() * 0.2 + 0.4;
     this.movement = this.speed;
     this.health = 100;
     this.maxHealth = this.health;
@@ -296,6 +388,25 @@ function handleEnemies() {
     }
     if (enemies[i].health <= 0) {
       let gainedResources = enemies[i].maxHealth / 10;
+      floatingMessages.push(
+        new FloatingMessage(
+          "+" + gainedResources,
+          enemies[i].x,
+          enemies[i].y,
+          25,
+          "white"
+        )
+      );
+      // for the ניקוד
+      // floatingMessages.push(
+      //   new FloatingMessage(
+      //     "+" + gainedResources,
+      //     enemies[i].x,
+      //     enemies[i].y,
+      //     25,
+      //     "white"
+      //   )
+      // );
       numberOfResources += gainedResources;
       score += gainedResources;
 
@@ -320,14 +431,14 @@ function handleEnemies() {
 // resources
 const resourceTypes = [];
 const megaPhone = new Image();
-megaPhone.src = "megaPhone.png";
+megaPhone.src = "./assets/megaPhone.png";
 resourceTypes.push(megaPhone);
 
 const amounts = [20, 30, 40];
 class Resource {
   constructor() {
     this.x = (Math.floor(Math.random() * 5) + 1) * cellSize - 100;
-    this.y = 100 + (Math.random() * (canvas.height - (cellSize * 2.5)));
+    this.y = 100 + Math.random() * (canvas.height - cellSize * 2.5);
     // this.y = Math.random() * (cellSize);
     this.width = cellSize * 0.4;
     this.height = cellSize * 0.4;
@@ -335,7 +446,6 @@ class Resource {
     this.spriteWidth = 150;
     this.spriteHeight = 120;
     this.resourceType = resourceTypes[0];
-
   }
   draw() {
     // context.fillStyle = "yellow";
@@ -361,6 +471,26 @@ function handleResources() {
     resources[i].draw();
     if (resources[i] && mouse.x && mouse.y && collision(resources[i], mouse)) {
       numberOfResources += resources[i].amount;
+      // for the resource itself
+      floatingMessages.push(
+        new FloatingMessage(
+          "+" + resources[i].amount,
+          resources[i].x,
+          resources[i].y,
+          25,
+          "white"
+        )
+      );
+      // for the משאבים
+      // floatingMessages.push(
+      //   new FloatingMessage(
+      //     "+" + resources[i].amount,
+      //     mouse.x,
+      //     mouse.y,
+      //     15,
+      //     "white"
+      //   )
+      // );
       resources.splice(i, 1);
       i--;
     }
@@ -370,8 +500,12 @@ function handleResources() {
 function handleGameStatus() {
   fillStyle = "black";
   context.font = "30px Arial";
-  context.fillText("Score: " + score, 20, canvas.height - 25);
-  context.fillText("Resources: " + numberOfResources, 20, canvas.height - 65);
+  context.fillText(
+    "משאבים: " + numberOfResources,
+    canvas.width - 180,
+    canvas.height - 65
+  );
+  context.fillText("ניקוד: " + score, canvas.width - 110, canvas.height - 25);
   if (gameOver) {
     context.fillStyle = "black";
     context.font = "60px Arial";
@@ -386,27 +520,43 @@ function handleGameStatus() {
   }
 }
 const bibi = new Image();
-bibi.src = "bibi.png";
+bibi.src = "./assets/bibi.png";
+
+canvas.addEventListener("click", function () {
+  const gridPositionX = mouse.x - (mouse.x % cellSize) + cellGap;
+  const gridPositionY = mouse.y - (mouse.y % cellSize) + cellGap;
+  // placement higher than controls bar
+  if (gridPositionY > controlsBar.y || gridPositionY < enemyBar.height) return;
+  // cancel placement on top of each other
+  for (let i = 0; i < defenders.length; i++) {
+    if (defenders[i].x === gridPositionX && defenders[i].y === gridPositionY)
+      return;
+  }
+  let defenderCost = 100;
+  if (numberOfResources >= defenderCost) {
+    defenders.push(new Defender(gridPositionX, gridPositionY));
+    numberOfResources -= defenderCost;
+  } else {
+    floatingMessages.push(
+      new FloatingMessage(
+        "אין מספיק משאבים",
+        mouse.x - 50,
+        mouse.y,
+        15,
+        "white"
+      )
+    );
+  }
+});
 
 function animate() {
   context.clearRect(0, 0, canvas.width, canvas.height);
   context.fillStyle = "orange";
-  
-  context.fillRect(
-    enemyBar.x,
-    enemyBar.y,
-    enemyBar.width,
-    enemyBar.height
-    );
-  context.drawImage(
-    bibi,
-    0,
-    0,
-    152,
-    100
-  )
-    
-  context.fillStyle = "blue";
+
+  context.fillRect(enemyBar.x, enemyBar.y, enemyBar.width, enemyBar.height);
+  context.drawImage(bibi, 0, 0, 152, 100);
+
+  context.fillStyle = "grey";
   context.fillRect(
     controlsBar.x,
     controlsBar.y,
@@ -419,7 +569,9 @@ function animate() {
   handleDefenders();
   handleProjectiles();
   handleEnemies();
+  chooseAction();
   handleGameStatus();
+  handleFloatingMessages();
   frame++;
   if (!gameOver) requestAnimationFrame(animate);
 }
