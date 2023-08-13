@@ -1,4 +1,3 @@
-// import { Cell } from "./classes.js";
 
 const canvas = document.getElementById("canvas1");
 const context = canvas.getContext("2d");
@@ -603,11 +602,11 @@ canvas.addEventListener("click", function () {
     if (defenders[i].x === gridPositionX && defenders[i].y === gridPositionY)
       return;
   }
-  for (let i = 0; i < resources.length; i++) {
-    if (collision(resources[i], mouse))
-    gameOver = true;
+  // for (let i = 0; i < resources.length; i++) {
+  //   if (collision(resources[i], mouse))
+  //   gameOver = true;
     
-  }
+  // }
   let defenderCost = 100;
   if (numberOfResources >= defenderCost) {
     defenders.push(new Defender(gridPositionX, gridPositionY));
