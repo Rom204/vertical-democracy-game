@@ -10,8 +10,6 @@ let cellSize = 100;
 let cellGap = 3;
 
 if (window.innerWidth < 700) {
-  // canvas.width -= 125
-  // canvas.height -= 125
   cellSize = 75;
   cellGap = 0.2;
 }
@@ -414,12 +412,11 @@ class Enemy {
     this.width = cellSize - cellGap * 2;
     this.height = cellSize - cellGap * 2;
     // this.speed = Math.random() * 0.0001 + 0.04;
-    this.speed = Math.random() * 0.8 + 0.4;
+    this.speed = Math.random() * 0.3 + 0.4;
     this.movement = this.speed;
     this.health = 100;
     this.maxHealth = this.health;
     this.enemyType = enemyTypes[0];
-    // this.rule = 9
     this.rule = Math.floor(Math.random() * 10);
   }
   update() {
@@ -572,29 +569,13 @@ function handleGameStatus() {
     canvas.width - 10,
     canvas.height - 20
   );
-  // if (gameOver) {
-  //   context.fillStyle = "black";
-  //   context.font = "60px Arial";
-  //   context.fillText("GAME OVER", 135, 330);
-  // }
   if (score >= winningScore && enemies.length === 0) {
-    // context.fillStyle = "black";
-    // context.font = "60px Arial";
-    // context.fillText("VICTORY !", 0, 300);
-    // context.font = "30px Arial";
-    // context.fillText("You win with " + score + " points!", 0, 340);
-    // gameWon = true;
     document.getElementById("modal-header").innerHTML =
       "מעולה הצלחת לחסום את כל החוקים !!!";
     gameOver = true;
     setTimeout(toggleModal(), 1000);
   }
   if (gameOver) {
-    // context.fillStyle = "rgba(0,0,0,0.5)";
-    // context.fillRect(0, 0, canvas.width, canvas.height);
-    // context.fillStyle = "white";
-    // context.textAlign = "center";
-    // context
     setTimeout(toggleModal(), 1000);
   }
 }
@@ -652,8 +633,6 @@ function animate() {
 
   context.fillRect(enemyBar.x, enemyBar.y, enemyBar.width, enemyBar.height);
   context.drawImage(bibi, 50, 0, 100, 160, 0, 0, cellSize, cellSize);
-
-  // context.fillRect(enemyBar.x, enemyBar.y, enemyBar.width, enemyBar.height);
   context.drawImage(Ten, 0, 0, 3636, 2745, cellSize, 0, cellSize * 4, cellSize);
 
   context.fillStyle = "grey";
@@ -673,7 +652,6 @@ function animate() {
   handleFloatingMessages();
   frame++;
   if (!gameOver) requestAnimationFrame(animate);
-  // else if(!gameWon) requestAnimationFrame(animate) ;
 }
 animate();
 
