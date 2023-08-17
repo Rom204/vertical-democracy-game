@@ -5,6 +5,11 @@ body {
   direction: rtl;
 }
 
+img { 
+  max-width: 100%;
+  height: auto;
+}
+
 #canvas1 {
   position: absolute;
   top: 50%;

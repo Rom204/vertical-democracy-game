@@ -16,6 +16,195 @@
 			href="style.css" />
 	</head>
 	<body>
+		<!-- On-Boarding tutorial -->
+		<!-- first modal -->
+		<div
+			class="modal fade"
+			id="exampleModalToggle"
+			aria-hidden="true"
+			data-bs-backdrop="static"
+			aria-labelledby="exampleModalToggleLabel"
+			tabindex="-1">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h1
+							class="modal-title fs-5"
+							id="exampleModalToggleLabel">
+							ברוכים הבאים למשחק ״המלחמה בחוקים״
+						</h1>
+					</div>
+					<div class="modal-body">
+						<h2>תוכלו להתחיל לשחק בלחיצה על כפתור ״שחק״ או על כפתור ״הבא״ בשביל לקבל עוד מידע לגביי חוקי המשחק</h2>
+					</div>
+					<div class="modal-footer">
+						<button
+							class="btn btn-primary"
+							data-bs-target="#exampleModalToggle2"
+							data-bs-toggle="modal">
+							הבא
+						</button>
+						<button
+							id="start-button1"
+							class="btn btn-primary"
+							data-bs-dismiss="modal">
+							שחק
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div
+			class="modal fade"
+			id="exampleModalToggle2"
+			aria-hidden="true"
+			aria-labelledby="exampleModalToggleLabel2"
+			data-bs-backdrop="static"
+			tabindex="-1">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header">
+						<img
+							src="./assets/enemyBar.png"
+							alt="" />
+					</div>
+					<div class="modal-body">
+						<h2>שימו לב ! זאת היא רשימת החוקים שינסו לעבור את קו ההגנה שלנו .</h2>
+					</div>
+					<div class="modal-footer">
+						<button
+							class="btn btn-primary"
+							data-bs-target="#exampleModalToggle3"
+							data-bs-toggle="modal">
+							הבא
+						</button>
+						<button
+							class="btn btn-primary"
+							data-bs-target="#exampleModalToggle"
+							data-bs-toggle="modal">
+							חזרה אחורה
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div
+			class="modal fade"
+			id="exampleModalToggle3"
+			aria-hidden="true"
+			aria-labelledby="exampleModalToggleLabel3"
+			data-bs-backdrop="static"
+			tabindex="-1">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header">
+						<img
+							src="./assets/map.png"
+							alt="" />
+					</div>
+					<div class="modal-body">
+						<h2>מפת המשחק: ניתן לראות כי החוק - ״רחצה״ הצליח להגיע אל קו ההגנה שלנו ולכן הפסדנו במשחק !</h2>
+					</div>
+					<div class="modal-footer">
+						<button
+							class="btn btn-primary"
+							data-bs-target="#exampleModalToggle4"
+							data-bs-toggle="modal">
+							הבא
+						</button>
+						<button
+							class="btn btn-primary"
+							data-bs-target="#exampleModalToggle2"
+							data-bs-toggle="modal">
+							חזרה אחורה
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div
+			class="modal fade"
+			id="exampleModalToggle4"
+			aria-hidden="true"
+			aria-labelledby="exampleModalToggleLabel4"
+			data-bs-backdrop="static"
+			tabindex="-1">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header">
+						<img
+							src="./assets/actionBar.png"
+							alt="" />
+					</div>
+					<div class="modal-body">
+						<h2>
+							בשביל שנוכל להילחם בחוקים ולמנוע מהם להגיע לקו ההגנה נצטרך למקם על גבי המפה מפגינים מכוח קפלן
+							<hr />
+							<ul>
+								<li>עלות מפגין = 100 משאבים.</li>
+								<li>חוק שנהדוף = 10 משאבים.</li>
+								<li>מגה-פון = 20 עד 40 משאבים</li>
+							</ul>
+						</h2>
+					</div>
+					<div class="modal-footer">
+						<button
+							class="btn btn-primary"
+							data-bs-target="#exampleModalToggle5"
+							data-bs-toggle="modal">
+							הבא
+						</button>
+						<button
+							class="btn btn-primary"
+							data-bs-target="#exampleModalToggle3"
+							data-bs-toggle="modal">
+							חזרה אחורה
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div
+			class="modal fade"
+			id="exampleModalToggle5"
+			aria-hidden="true"
+			aria-labelledby="exampleModalToggleLabel5"
+			data-bs-backdrop="static"
+			tabindex="-1">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header">
+						<img
+							src="./assets/resource.png"
+							alt="" />
+					</div>
+					<div class="modal-body">
+						<h2>לאחר שממקמים את המפגינים אין אפשרות להזיז אותם , הם נלחמים בעצמם ולא צריך לעזור מלבד למקם אותם במיקום אסטרטגי.</h2>
+					</div>
+					<div class="modal-footer">
+						<button
+							class="btn btn-primary"
+							data-bs-target="#exampleModalToggle4"
+							data-bs-toggle="modal">
+							חזרה אחורה
+						</button>
+						<button
+							id="start-button2"
+							class="btn btn-primary"
+							data-bs-dismiss="modal">
+							שחק
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<button
+			class="btn btn-primary"
+			data-bs-target="#exampleModalToggle"
+			data-bs-toggle="modal">
+			פתח חוקי משחק
+		</button>
+
 		<!-- Modal -->
 		<div
 			class="modal fade"
@@ -28,24 +217,19 @@
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h1
+						<h2
 							class="modal-title fs-5"
-							id="modal-header"></h1>
-						<button
-							type="button"
-							class="btn-close"
-							data-bs-dismiss="modal"
-							aria-label="Close"></button>
+							id="modal-header"></h2>
 					</div>
 					<div class="modal-body">
-						<h2>
+						<h1>
 							לעוד מידע ותמיכה מוזמנים להצטרף בלחיצה על הקישור
 							<a
 								href="https://www.kaplanforce.com/"
 								target="_blank"
 								>כוח קפלן</a
 							>
-						</h2>
+						</h1>
 					</div>
 					<div class="modal-footer">
 						<button
@@ -56,9 +240,9 @@
 						</button>
 						<button
 							type="button"
+							id="restart-button"
 							class="btn btn-primary"
-							data-bs-dismiss="modal"
-							onclick="restartGame()">
+							data-bs-dismiss="modal">
 							! שחק שוב
 						</button>
 					</div>
