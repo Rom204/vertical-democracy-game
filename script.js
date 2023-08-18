@@ -1,7 +1,29 @@
+// import * as Tone from '../node_modules/tone/build/Tone.js';;
+
 window.addEventListener("load", function () {
+	
+	const collectSound = new Audio();
+	collectSound.src = './assets/collect.mp3';
+	
+	const backgroundSound = new Audio();
+	backgroundSound.src = './assets/gameMusic.mp3';
+
+	const throwFlag = new Audio();
+	throwFlag.src = './assets/throw.mp3';
+
+	const hit = new Audio();
+	hit.src = './assets/hit.mp3';
+
+	// const backgroundSound = new Audio();
+	// backgroundSound.src = '/.assets/gameMusic.mp3';
+
+	// const backgroundSound = new Audio();
+	// backgroundSound.src = '/.assets/gameMusic.mp3';
+
+
 	const canvas = document.getElementById("canvas1");
 	const context = canvas.getContext("2d");
-
+	
 	let canvasPosition = canvas.getBoundingClientRect();
 	canvas.width = canvasPosition.width;
 	canvas.height = canvasPosition.height;
@@ -16,6 +38,7 @@ window.addEventListener("load", function () {
 	// global variables
 	let numberOfResources = 300;
 	let enemiesInterval = 600;
+	let enemySpeed = 0.2;
 	let frame = 0;
 	let gameOver = false;
 	let gameStarted = false;
@@ -74,6 +97,7 @@ window.addEventListener("load", function () {
 		enemyPositions = [];
 		projectiles = [];
 		resources = [];
+		backgroundSound.play();
 		animate();
 	}
 
@@ -175,6 +199,7 @@ window.addEventListener("load", function () {
 			for (let j = 0; j < enemies.length; j++) {
 				if (enemies[j] && projectiles[i] && collision(projectiles[i], enemies[j])) {
 					enemies[j].health -= projectiles[i].power;
+					hit.play();
 					projectiles.splice(i, 1);
 					i--;
 				}
@@ -217,6 +242,7 @@ window.addEventListener("load", function () {
 				this.timer += 2;
 				if (this.timer % this.fireRate === 0) {
 					projectiles.push(new Projectile(this.x, this.y));
+					throwFlag.play();
 				}
 			} else {
 				this.timer = 0;
@@ -287,12 +313,10 @@ window.addEventListener("load", function () {
 		//   selectedDefender = true;
 		// }
 		// if (selectedDefender) strokeColor = 'gold';
-
 		// powerUp activate
 		// if (collision(mouse, powerUp) && mouse.clicked) {
 		//   Projectile.powerUp();
 		// }
-
 		// context.lineWidth = 1;
 		// context.fillStyle = "rgba(0,0,0,0.5)";
 		// context.fillRect(powerUp.x, powerUp.y, powerUp.width, powerUp.height);
@@ -319,10 +343,10 @@ window.addEventListener("load", function () {
 		//   speedUp.width - 20,
 		//   speedUp.height - 20
 		// );
-		context.fillRect(warrior.x, warrior.y, warrior.width, warrior.height);
-		// context.strokeStyle = strokeColor;
-		context.strokeRect(warrior.x, warrior.y, warrior.width, warrior.height);
-		context.drawImage(defender1, 0, 0, 628, 628, warrior.x, warrior.y, cellSize - 20, cellSize - 20);
+		// context.fillRect(warrior.x, warrior.y, warrior.width, warrior.height);
+		// // context.strokeStyle = strokeColor;
+		// context.strokeRect(warrior.x, warrior.y, warrior.width, warrior.height);
+		// context.drawImage(defender1, 0, 0, 628, 628, warrior.x, warrior.y, cellSize - 20, cellSize - 20);
 	}
 
 	// floating messages
@@ -369,15 +393,15 @@ window.addEventListener("load", function () {
 	lawScroll.src = "./assets/scroll.png";
 	enemyTypes.push(lawScroll);
 
-	let rules = ["נבצרות", "מתנות", "יועמ״שים", "ההתגברות", "משטרה", "רחצה", "דרעי", "לא ברוב", "עבריין כרה״מ", "פטור מגיוס"];
+	let rules = ["נבצרות", "מתנות", "יועמ״שים", "ההתגברות", "משטרה", "רחצה", "דרעי", "לא ברוב", "עבריין כרה״מ", `פטור מגיוס`];
 
 	class Enemy {
-		constructor(horizontalPosition) {
+		constructor(horizontalPosition, speed) {
 			this.x = horizontalPosition;
 			this.y = cellSize;
 			this.width = cellSize - cellGap * 2;
 			this.height = cellSize - cellGap * 2;
-			this.speed = Math.random() * 0.2 + 0.04;
+			this.speed = Math.random() * 0.2 + speed;
 			// this.speed = Math.random() * 0.3 + 0.4;
 			this.movement = this.speed;
 			this.health = 100;
@@ -388,12 +412,14 @@ window.addEventListener("load", function () {
 		update() {
 			this.y += this.movement;
 		}
+
 		draw() {
 			context.drawImage(this.enemyType, 0, 0, 495, 643, this.x, this.y, this.width, this.height);
 			context.fillStyle = "black";
 			context.font = "20px Arial";
 			context.fillText(Math.floor(this.health), this.x + 35, this.y);
-			context.fillText(rules[this.rule], this.x + this.width - cellGap * 4, this.y + this.height - 30);
+			context.font = "15px Arial";
+			context.fillText(rules[this.rule], this.x + this.width - cellGap * 4, this.y + this.height - 50);
 		}
 	}
 	function handleEnemies() {
@@ -420,6 +446,7 @@ window.addEventListener("load", function () {
 				// );
 				numberOfResources += gainedResources;
 				score += gainedResources;
+				collectSound.play();
 
 				const findThisIndex = enemyPositions.indexOf(enemies[i].x);
 				enemyPositions.splice(findThisIndex, 1);
@@ -430,9 +457,16 @@ window.addEventListener("load", function () {
 
 		if (frame % enemiesInterval === 0 && score < winningScore) {
 			let horizontalPosition = Math.floor(Math.random() * 5 + 1) * cellSize - cellSize + cellGap;
-			enemies.push(new Enemy(horizontalPosition));
+
+			enemies.push(new Enemy(horizontalPosition, enemySpeed));
 			enemyPositions.push(horizontalPosition);
-			if (enemiesInterval > 120) enemiesInterval -= 100;
+
+			if (enemySpeed < 0.7) enemySpeed += 0.02;
+			console.log(enemySpeed);
+
+			if (enemiesInterval > 120) {
+				enemiesInterval -= 100;
+			}
 		}
 	}
 	// _______________________________________________
@@ -447,7 +481,7 @@ window.addEventListener("load", function () {
 	class Resource {
 		constructor() {
 			this.x = (Math.floor(Math.random() * 5) + 1) * cellSize - cellSize;
-			this.y = cellSize + (Math.floor((Math.random() * 7) + 1) * cellSize - cellSize);
+			this.y = cellSize + (Math.floor(Math.random() * 6 + 1) * cellSize - cellSize);
 			this.width = cellSize;
 			this.height = cellSize;
 			this.amount = amounts[Math.floor(Math.random() * amounts.length)];
@@ -465,17 +499,15 @@ window.addEventListener("load", function () {
 			resources.push(new Resource());
 		}
 		for (let i = 0; i < resources.length; i++) {
-      for (let j = 0; j < defenders.length; j++){
-        if (collision(resources[i], defenders[j])){
-          resources.splice(i, 1);
-          i--;
-          break;
-        } else {
-          resources[i].draw();
-        }
-      }
-			// if (resources[i] && mouse.x && mouse.y && collision(resources[i], mouse)) {
-			// 	numberOfResources += resources[i].amount;
+			for (let j = 0; j < defenders.length; j++) {
+				if (collision(resources[i], defenders[j])) {
+					resources.splice(i, 1);
+					i--;
+					break;
+				} else {
+					resources[i].draw();
+				}
+			}
 			// 	// for the resource itself
 			// 	floatingMessages.push(new FloatingMessage("+" + resources[i].amount, resources[i].x, resources[i].y, 25, "white"));
 			// 	// for the משאבים
@@ -508,6 +540,7 @@ window.addEventListener("load", function () {
 			setTimeout(toggleModal(), 1000);
 		}
 		if (gameOver) {
+			backgroundSound.pause();
 			setTimeout(toggleModal(), 1000);
 		}
 	}
@@ -539,6 +572,7 @@ window.addEventListener("load", function () {
 		for (let i = 0; i < resources.length; i++) {
 			if (collision(resources[i], mouse)) {
 				numberOfResources += resources[i].amount;
+				collectSound.play();
 				// for the resource itself
 				floatingMessages.push(new FloatingMessage("+" + resources[i].amount, resources[i].x, resources[i].y, 25, "white"));
 				// for the משאבים
@@ -561,24 +595,14 @@ window.addEventListener("load", function () {
 
 		let defenderCost = 100;
 
-    if (!resourceCollisionDetected){
-      if(numberOfResources >= defenderCost){
-        defenders.push(new Defender(gridPositionX, gridPositionY));
-        numberOfResources -= defenderCost;
-      } else {
-        floatingMessages.push(new FloatingMessage("אין מספיק משאבים", mouse.x, mouse.y, 25, "white"));
-      }
-    }
-
-
-		// if (numberOfResources >= defenderCost) {
-    //   if (!resourceCollisionDetected) {
-    //     defenders.push(new Defender(gridPositionX, gridPositionY));
-    //     numberOfResources -= defenderCost;
-    //   }
-		// } else {
-		// 	floatingMessages.push(new FloatingMessage("אין מספיק משאבים", mouse.x + 50, mouse.y, 35, "white"));
-		// }
+		if (!resourceCollisionDetected) {
+			if (numberOfResources >= defenderCost) {
+				defenders.push(new Defender(gridPositionX, gridPositionY));
+				numberOfResources -= defenderCost;
+			} else {
+				floatingMessages.push(new FloatingMessage("אין מספיק משאבים", mouse.x, mouse.y, 25, "white"));
+			}
+		}
 	});
 
 	// main function
@@ -604,7 +628,6 @@ window.addEventListener("load", function () {
 		frame++;
 		if (!gameOver && gameStarted) {
 			requestAnimationFrame(animate);
-			console.log(gameOver, gameStarted);
 		}
 	}
 	animate();
