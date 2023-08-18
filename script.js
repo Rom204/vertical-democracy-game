@@ -1,29 +1,29 @@
-// import * as Tone from '../node_modules/tone/build/Tone.js';;
+// Audio - music & sound effects
+const backgroundSound = new Audio();
+backgroundSound.src = "./assets/audio/gameMusic.mp3";
+
+const collectSound = new Audio();
+collectSound.src = "./assets/audio/collect.mp3";
+
+const throwFlag = new Audio();
+throwFlag.src = "./assets/audio/throw.mp3";
+
+const hit = new Audio();
+hit.src = "./assets/audio/hit.mp3";
+
+const crowd = new Audio();
+crowd.src = "./assets/audio/crowd.mp3";
+
+const fail = new Audio();
+fail.src = "./assets/audio/fail.mp3";
+
+const victory = new Audio();
+victory.src = "./assets/audio/victory.mp3";
 
 window.addEventListener("load", function () {
-	
-	const collectSound = new Audio();
-	collectSound.src = './assets/collect.mp3';
-	
-	const backgroundSound = new Audio();
-	backgroundSound.src = './assets/gameMusic.mp3';
-
-	const throwFlag = new Audio();
-	throwFlag.src = './assets/throw.mp3';
-
-	const hit = new Audio();
-	hit.src = './assets/hit.mp3';
-
-	// const backgroundSound = new Audio();
-	// backgroundSound.src = '/.assets/gameMusic.mp3';
-
-	// const backgroundSound = new Audio();
-	// backgroundSound.src = '/.assets/gameMusic.mp3';
-
-
 	const canvas = document.getElementById("canvas1");
 	const context = canvas.getContext("2d");
-	
+
 	let canvasPosition = canvas.getBoundingClientRect();
 	canvas.width = canvasPosition.width;
 	canvas.height = canvasPosition.height;
@@ -85,6 +85,7 @@ window.addEventListener("load", function () {
 	document.querySelector("#restart-button").addEventListener("click", restartGame);
 	document.querySelector("#start-button1").addEventListener("click", restartGame);
 	document.querySelector("#start-button2").addEventListener("click", restartGame);
+	this.document.querySelector("#rules-button").addEventListener("click", () => (gameStarted = false));
 	function restartGame() {
 		gameOver = false;
 		gameStarted = true;
@@ -97,6 +98,7 @@ window.addEventListener("load", function () {
 		enemyPositions = [];
 		projectiles = [];
 		resources = [];
+		crowd.play();
 		backgroundSound.play();
 		animate();
 	}
@@ -534,6 +536,11 @@ window.addEventListener("load", function () {
 		context.fillText(`${numberOfResources} משאבים`, canvas.width - 10, canvas.height - cellSize + 30);
 		context.fillText(`${score} חוקים שהושמדו`, canvas.width - 10, canvas.height - 20);
 		if (score >= winningScore && enemies.length === 0) {
+			backgroundSound.pause();
+			victory.play();
+			crowd.play();
+			crowd.loop = true;
+			setTimeout(() => (crowd.loop = false), 3000);
 			document.getElementById("modal-header").innerHTML = "מעולה הצלחת לחסום את כל החוקים !!!";
 			gameOver = true;
 			gameStarted = false;
@@ -541,6 +548,7 @@ window.addEventListener("load", function () {
 		}
 		if (gameOver) {
 			backgroundSound.pause();
+			fail.play();
 			setTimeout(toggleModal(), 1000);
 		}
 	}

@@ -10,6 +10,13 @@ img {
   height: auto;
 }
 
+#rules-button{
+  z-index: 1;
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+}
+
 #canvas1 {
   position: absolute;
   top: 50%;
