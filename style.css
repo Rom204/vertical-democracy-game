@@ -27,6 +27,8 @@ img {
   width: 500px;
   height: 800px;
   background: white;
+  font-family: 'Handjet', cursive;
+  font-family: 'Comfortaa', cursive;
 }
 
 @media only screen and (max-width: 600px) {

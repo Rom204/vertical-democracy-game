@@ -32,7 +32,7 @@ window.addEventListener("load", function () {
 
 	if (window.innerWidth < 700) {
 		cellSize = 75;
-		cellGap = 0.2;
+		cellGap = 2.25;
 	}
 
 	// global variables
@@ -395,14 +395,14 @@ window.addEventListener("load", function () {
 	lawScroll.src = "./assets/scroll.png";
 	enemyTypes.push(lawScroll);
 
-	let rules = ["נבצרות", "מתנות", "יועמ״שים", "ההתגברות", "משטרה", "רחצה", "דרעי", "לא ברוב", "עבריין כרה״מ", `פטור מגיוס`];
+	let rules = ["   נבצרות   ", "   מתנות    ", "  יוע״משים  ", "  ההתגברות  ", "   משטרה    ", "    רחצה    ", "    דרעי    ", "   לא ברוב  ", "עבריין כרה״מ", ` פטור מגיוס `];
 
 	class Enemy {
 		constructor(horizontalPosition, speed) {
 			this.x = horizontalPosition;
 			this.y = cellSize;
 			this.width = cellSize - cellGap * 2;
-			this.height = cellSize - cellGap * 2;
+			this.height = cellSize - cellGap * 8;
 			this.speed = Math.random() * 0.2 + speed;
 			// this.speed = Math.random() * 0.3 + 0.4;
 			this.movement = this.speed;
@@ -416,12 +416,12 @@ window.addEventListener("load", function () {
 		}
 
 		draw() {
-			context.drawImage(this.enemyType, 0, 0, 495, 643, this.x, this.y, this.width, this.height);
+			context.drawImage(this.enemyType, 0, 0, 495, 643, this.x - cellGap * 3, this.y, this.width + cellGap * 6, this.height);
 			context.fillStyle = "black";
-			context.font = "20px Arial";
+			context.font = "20px Comfortaa";
 			context.fillText(Math.floor(this.health), this.x + 35, this.y);
-			context.font = "15px Arial";
-			context.fillText(rules[this.rule], this.x + this.width - cellGap * 4, this.y + this.height - 50);
+			context.font = "14px Comfortaa";
+			context.fillText(rules[this.rule], this.x + this.width - cellGap, this.y + this.height / 2);
 		}
 	}
 	function handleEnemies() {
@@ -532,7 +532,7 @@ window.addEventListener("load", function () {
 	// utilities
 	function handleGameStatus() {
 		context.fillStyle = "black";
-		context.font = "30px Arial";
+		context.font = "30px Comfortaa";
 		context.fillText(`${numberOfResources} משאבים`, canvas.width - 10, canvas.height - cellSize + 30);
 		context.fillText(`${score} חוקים שהושמדו`, canvas.width - 10, canvas.height - 20);
 		if (score >= winningScore && enemies.length === 0) {
