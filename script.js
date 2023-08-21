@@ -19,12 +19,37 @@ fail.src = "./assets/audio/fail.mp3";
 
 const victory = new Audio();
 victory.src = "./assets/audio/victory.mp3";
+// --------------------------------------------
+// Media - images & vectors
+const road = new Image();
+road.src = "./assets/road2.png";
+
+const israelFlag = new Image();
+israelFlag.src = "./assets/israelFlag1.png";
+
+const defender1 = new Image();
+defender1.src = "./assets/defender3.png";
+
+const lawScroll = new Image();
+lawScroll.src = "./assets/scroll.png";
+
+const megaPhone = new Image();
+megaPhone.src = "./assets/mega-phone.png";
+
+const bibi = new Image();
+bibi.src = "./assets/bibi1.png";
+
+const Ten = new Image();
+Ten.src = "./assets/Ten1.png";
+// --------------------------------------------
 
 window.addEventListener("load", function () {
+	const modal = new bootstrap.Modal(document.getElementById("staticBackdrop"));
+
 	const canvas = document.getElementById("canvas1");
 	const context = canvas.getContext("2d");
-
 	let canvasPosition = canvas.getBoundingClientRect();
+
 	canvas.width = canvasPosition.width;
 	canvas.height = canvasPosition.height;
 	let cellSize = 100;
@@ -35,7 +60,11 @@ window.addEventListener("load", function () {
 		cellGap = 2.25;
 	}
 
-	// global variables
+	function toggleModal() {
+		modal.toggle();
+	}
+
+	// Global variables
 	let numberOfResources = 300;
 	let enemiesInterval = 600;
 	let enemySpeed = 0.2;
@@ -44,15 +73,29 @@ window.addEventListener("load", function () {
 	let gameStarted = false;
 	let score = 0;
 	const winningScore = 300;
-	// let selectedDefender = false;
+	const floatingMessages = [];
+	const amounts = [20, 30, 40];
 	let gameGrid = [];
 	let defenders = [];
 	let enemies = [];
 	let enemyPositions = [];
 	let projectiles = [];
 	let resources = [];
-	// ____________________________________
-	// mouse
+	let rules = ["   נבצרות   ", "   מתנות    ", "  יוע״משים  ", "  ההתגברות  ", "   משטרה    ", "    רחצה    ", "    דרעי    ", "   לא ברוב  ", "עבריין כרה״מ", ` פטור מגיוס `];
+	// -------------------------------
+	// Game board & Utils
+	const controlsBar = {
+		width: canvas.width,
+		height: cellSize,
+		x: 0,
+		y: canvas.height - cellSize,
+	};
+	const enemyBar = {
+		width: canvas.width,
+		height: cellSize,
+		x: 0,
+		y: 0,
+	};
 	const mouse = {
 		x: 10,
 		y: 10,
@@ -60,6 +103,10 @@ window.addEventListener("load", function () {
 		height: 0.1,
 		clicked: false,
 	};
+
+	window.addEventListener("resize", function () {
+		canvasPosition = canvas.getBoundingClientRect();
+	});
 
 	canvas.addEventListener("mousedown", function () {
 		mouse.clicked = true;
@@ -78,14 +125,16 @@ window.addEventListener("load", function () {
 		mouse.x = undefined;
 		mouse.y = undefined;
 	});
-	// ________________________________________________
+	// --------------------------------------------------
+	// Modal & restart game
 	$(document).ready(function () {
 		$("#exampleModalToggle").modal("show");
 	});
 	document.querySelector("#restart-button").addEventListener("click", restartGame);
 	document.querySelector("#start-button1").addEventListener("click", restartGame);
 	document.querySelector("#start-button2").addEventListener("click", restartGame);
-	this.document.querySelector("#rules-button").addEventListener("click", () => (gameStarted = false));
+	document.querySelector("#rules-button").addEventListener("click", () => (gameStarted = false));
+
 	function restartGame() {
 		gameOver = false;
 		gameStarted = true;
@@ -103,33 +152,14 @@ window.addEventListener("load", function () {
 		animate();
 	}
 
-	// game board
-	const controlsBar = {
-		width: canvas.width,
-		height: cellSize,
-		x: 0,
-		y: canvas.height - cellSize,
-	};
-
-	const enemyBar = {
-		width: canvas.width,
-		height: cellSize,
-		x: 0,
-		y: 0,
-	};
-
-	const mapTypes = [];
-	const road = new Image();
-	road.src = "./assets/road2.png";
-	mapTypes.push(road);
-
+	// Game structure
 	class Cell {
 		constructor(x, y) {
 			this.x = x;
 			this.y = y;
 			this.width = cellSize;
 			this.height = cellSize;
-			this.map = mapTypes[0];
+			this.map = road;
 		}
 		draw() {
 			context.drawImage(this.map, this.x, this.y, this.width, this.height);
@@ -154,13 +184,7 @@ window.addEventListener("load", function () {
 		}
 	}
 	// ____________________________________________
-
 	// projectiles
-	const projectileTypes = [];
-	const israelFlag = new Image();
-	israelFlag.src = "./assets/israelFlag1.png";
-	projectileTypes.push(israelFlag);
-
 	class Projectile {
 		constructor(x, y) {
 			this.x = x;
@@ -169,7 +193,7 @@ window.addEventListener("load", function () {
 			this.height = cellSize;
 			this.power = 20;
 			this.speed = 4;
-			this.projectileType = projectileTypes[0];
+			this.projectileType = israelFlag;
 			this.frameX = 0;
 			this.frameY = 0;
 			this.minFrame = 0;
@@ -206,19 +230,15 @@ window.addEventListener("load", function () {
 					i--;
 				}
 			}
-			// splice the projectile 50px before it reaches the top of the canvas (which is y = 0)
-			if (projectiles[i] && projectiles[i].y < canvas.height - canvas.height + cellSize - 50) {
+			// splice the projectile before it reaches the top of the canvas
+			if (projectiles[i] && projectiles[i].y <= cellSize / 2 + cellGap) {
 				projectiles.splice(i, 1);
 				i--;
 			}
 		}
 	}
-	// ____________________________________________________
-
+	// -------------------------------------------
 	// defenders
-	const defender1 = new Image();
-	defender1.src = "./assets/defender3.png";
-
 	class Defender {
 		constructor(x, y) {
 			this.x = x;
@@ -250,10 +270,6 @@ window.addEventListener("load", function () {
 				this.timer = 0;
 			}
 		}
-		// TODO: check fire rate option
-		// fireRate() {
-		//   if (this.fireRate >= 40) this.fireRate -= 10;
-		// }
 	}
 
 	function handleDefenders() {
@@ -280,79 +296,8 @@ window.addEventListener("load", function () {
 			}
 		}
 	}
-	const powerUpIcon = new Image();
-	powerUpIcon.src = "./assets/powerUpIcon.png";
-
-	const speedUpIcon = new Image();
-	speedUpIcon.src = "./assets/speedUpIcon.png";
-
-	// const powerUp = {
-	//   x: 10,
-	//   y: canvas.height - cellSize + 10,
-	//   width: cellSize - 20,
-	//   height: cellSize - 20,
-	// };
-
-	// const speedUp = {
-	//   x: cellSize + 10,
-	//   y: canvas.height - cellSize + 10,
-	//   width: cellSize - 20,
-	//   height: cellSize - 20,
-	// };
-
-	const warrior = {
-		x: 10,
-		y: canvas.height - cellSize + 10,
-		width: cellSize - 20,
-		height: cellSize - 20,
-	};
-
-	function chooseAction() {
-		// defender selection
-		// let strokeColor = 'black';
-		// if (collision(mouse, warrior) && mouse.clicked){
-		//   strokeColor = 'gold';
-		//   selectedDefender = true;
-		// }
-		// if (selectedDefender) strokeColor = 'gold';
-		// powerUp activate
-		// if (collision(mouse, powerUp) && mouse.clicked) {
-		//   Projectile.powerUp();
-		// }
-		// context.lineWidth = 1;
-		// context.fillStyle = "rgba(0,0,0,0.5)";
-		// context.fillRect(powerUp.x, powerUp.y, powerUp.width, powerUp.height);
-		// context.drawImage(
-		//   powerUpIcon,
-		//   0,
-		//   0,
-		//   230,
-		//   230,
-		//   powerUp.x + 10,
-		//   powerUp.y + 10,
-		//   powerUp.width - 20,
-		//   powerUp.height - 20
-		// );
-		// context.fillRect(speedUp.x, speedUp.y, speedUp.width, speedUp.height);
-		// context.drawImage(
-		//   speedUpIcon,
-		//   0,
-		//   0,
-		//   230,
-		//   230,
-		//   speedUp.x + 10,
-		//   speedUp.y + 10,
-		//   speedUp.width - 20,
-		//   speedUp.height - 20
-		// );
-		// context.fillRect(warrior.x, warrior.y, warrior.width, warrior.height);
-		// // context.strokeStyle = strokeColor;
-		// context.strokeRect(warrior.x, warrior.y, warrior.width, warrior.height);
-		// context.drawImage(defender1, 0, 0, 628, 628, warrior.x, warrior.y, cellSize - 20, cellSize - 20);
-	}
 
 	// floating messages
-	const floatingMessages = [];
 	class FloatingMessage {
 		constructor(value, x, y, size, color) {
 			this.value = value;
@@ -387,16 +332,8 @@ window.addEventListener("load", function () {
 			}
 		}
 	}
-
 	// __________________________________________________
 	// enemies
-	let enemyTypes = [];
-	const lawScroll = new Image();
-	lawScroll.src = "./assets/scroll.png";
-	enemyTypes.push(lawScroll);
-
-	let rules = ["   נבצרות   ", "   מתנות    ", "  יוע״משים  ", "  ההתגברות  ", "   משטרה    ", "    רחצה    ", "    דרעי    ", "   לא ברוב  ", "עבריין כרה״מ", ` פטור מגיוס `];
-
 	class Enemy {
 		constructor(horizontalPosition, speed) {
 			this.x = horizontalPosition;
@@ -404,11 +341,10 @@ window.addEventListener("load", function () {
 			this.width = cellSize - cellGap * 2;
 			this.height = cellSize - cellGap * 8;
 			this.speed = Math.random() * 0.2 + speed;
-			// this.speed = Math.random() * 0.3 + 0.4;
 			this.movement = this.speed;
 			this.health = 100;
 			this.maxHealth = this.health;
-			this.enemyType = enemyTypes[0];
+			this.enemyType = lawScroll;
 			this.rule = Math.floor(Math.random() * 10);
 		}
 		update() {
@@ -429,23 +365,15 @@ window.addEventListener("load", function () {
 			enemies[i].update();
 			enemies[i].draw();
 
-			if (enemies[i].y >= canvas.height - cellSize * 2) {
+			if (enemies[i].y + enemies[i].height >= canvas.height - cellSize) {
+				console.log(enemies[i].y);
 				gameOver = true;
 				document.getElementById("modal-header").innerHTML = "אוי לא ! החוק הצליח לעבור";
 			}
 			if (enemies[i].health <= 0) {
 				let gainedResources = enemies[i].maxHealth / 10;
 				floatingMessages.push(new FloatingMessage("+" + gainedResources, enemies[i].x, enemies[i].y, 25, "white"));
-				// for the ניקוד
-				// floatingMessages.push(
-				//   new FloatingMessage(
-				//     "+" + gainedResources,
-				//     enemies[i].x,
-				//     enemies[i].y,
-				//     25,
-				//     "white"
-				//   )
-				// );
+
 				numberOfResources += gainedResources;
 				score += gainedResources;
 				collectSound.play();
@@ -472,14 +400,7 @@ window.addEventListener("load", function () {
 		}
 	}
 	// _______________________________________________
-
 	// resources
-	const resourceTypes = [];
-	const megaPhone = new Image();
-	megaPhone.src = "./assets/mega-phone.png";
-	resourceTypes.push(megaPhone);
-
-	const amounts = [20, 30, 40];
 	class Resource {
 		constructor() {
 			this.x = (Math.floor(Math.random() * 5) + 1) * cellSize - cellSize;
@@ -489,7 +410,7 @@ window.addEventListener("load", function () {
 			this.amount = amounts[Math.floor(Math.random() * amounts.length)];
 			this.spriteWidth = 3000;
 			this.spriteHeight = 2400;
-			this.resourceType = resourceTypes[0];
+			this.resourceType = megaPhone;
 		}
 		draw() {
 			context.drawImage(this.resourceType, 0, 0, this.spriteWidth, this.spriteHeight, this.x, this.y, this.width, this.height);
@@ -497,7 +418,7 @@ window.addEventListener("load", function () {
 	}
 
 	function handleResources() {
-		if (frame % 500 === 0 && score < winningScore) {
+		if (frame % 500 === 0 && score < winningScore && defenders.length > 0) {
 			resources.push(new Resource());
 		}
 		for (let i = 0; i < resources.length; i++) {
@@ -510,26 +431,9 @@ window.addEventListener("load", function () {
 					resources[i].draw();
 				}
 			}
-			// 	// for the resource itself
-			// 	floatingMessages.push(new FloatingMessage("+" + resources[i].amount, resources[i].x, resources[i].y, 25, "white"));
-			// 	// for the משאבים
-			// 	// floatingMessages.push(
-			// 	//   new FloatingMessage(
-			// 	//     "+" + resources[i].amount,
-			// 	//     mouse.x,
-			// 	//     mouse.y,
-			// 	//     15,
-			// 	//     "white"
-			// 	//   )
-			// 	// );
-			// 	resources.splice(i, 1);
-			// 	i--;
-			// }
 		}
 	}
-	// _____________________________________________
-
-	// utilities
+	// --------------------------------------------------
 	function handleGameStatus() {
 		context.fillStyle = "black";
 		context.font = "30px Comfortaa";
@@ -544,27 +448,14 @@ window.addEventListener("load", function () {
 			document.getElementById("modal-header").innerHTML = "מעולה הצלחת לחסום את כל החוקים !!!";
 			gameOver = true;
 			gameStarted = false;
-			setTimeout(toggleModal(), 1000);
+			toggleModal();
 		}
 		if (gameOver) {
 			backgroundSound.pause();
 			fail.play();
-			setTimeout(toggleModal(), 1000);
+			toggleModal();
 		}
 	}
-
-	var modal = new bootstrap.Modal(document.getElementById("staticBackdrop"));
-
-	function toggleModal() {
-		// Toggle Modal
-		modal.toggle();
-	}
-
-	const bibi = new Image();
-	bibi.src = "./assets/bibi.png";
-
-	const Ten = new Image();
-	Ten.src = "./assets/Ten.png";
 
 	canvas.addEventListener("click", function () {
 		const gridPositionX = mouse.x - (mouse.x % cellSize) + cellGap;
@@ -581,25 +472,13 @@ window.addEventListener("load", function () {
 			if (collision(resources[i], mouse)) {
 				numberOfResources += resources[i].amount;
 				collectSound.play();
-				// for the resource itself
 				floatingMessages.push(new FloatingMessage("+" + resources[i].amount, resources[i].x, resources[i].y, 25, "white"));
-				// for the משאבים
-				// floatingMessages.push(
-				//   new FloatingMessage(
-				//     "+" + resources[i].amount,
-				//     mouse.x,
-				//     mouse.y,
-				//     15,
-				//     "white"
-				//   )
-				// );
 				resources.splice(i, 1);
 				i--;
 				resourceCollisionDetected = true;
 				break;
 			}
 		}
-		console.log(resourceCollisionDetected);
 
 		let defenderCost = 100;
 
@@ -613,24 +492,21 @@ window.addEventListener("load", function () {
 		}
 	});
 
-	// main function
+	// Main function
 	function animate() {
 		context.clearRect(0, 0, canvas.width, canvas.height);
 		handleGameGrid();
-		context.fillStyle = "grey";
 
+		context.fillStyle = "grey";
 		context.fillRect(enemyBar.x, enemyBar.y, enemyBar.width, enemyBar.height);
-		context.drawImage(bibi, 50, 0, 100, 160, 0, 0, cellSize, cellSize);
-		context.drawImage(Ten, 0, 0, 3636, 2745, cellSize, 0, cellSize * 4, cellSize);
-
-		context.fillStyle = "grey";
+		context.drawImage(bibi, 0, 0, 672, 854, 0, 0, cellSize, cellSize);
+		context.drawImage(Ten, 75, 0, 3636, 2745, cellSize, 0, cellSize * 4, cellSize);
 		context.fillRect(controlsBar.x, controlsBar.y, controlsBar.width, controlsBar.height);
 
 		handleResources();
 		handleDefenders();
 		handleProjectiles();
 		handleEnemies();
-		chooseAction();
 		handleGameStatus();
 		handleFloatingMessages();
 		frame++;
@@ -645,8 +521,4 @@ window.addEventListener("load", function () {
 			return true;
 		}
 	}
-
-	window.addEventListener("resize", function () {
-		canvasPosition = canvas.getBoundingClientRect();
-	});
 });
